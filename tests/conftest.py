@@ -2,11 +2,6 @@ import os
 
 import pytest
 
-
-# Базовая конфигурация для интеграционных тестов GigaChat API.
-# Вынесена в conftest.py, чтобы переиспользовать во всех тестовых модулях.
-
-
 @pytest.fixture(scope="session")
 def gigachat_url() -> str:
     """
