@@ -1,6 +1,14 @@
 import os
+import sys
+from pathlib import Path
 
 import pytest
+
+# Корень проекта в sys.path, чтобы при запуске `pytest` из корня работал импорт tests.api
+_root = Path(__file__).resolve().parent.parent
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
+
 
 @pytest.fixture(scope="session")
 def gigachat_url() -> str:
@@ -31,42 +39,31 @@ def gigachat_model() -> str:
     return os.getenv("GIGACHAT_MODEL_NAME", "GigaChat")
 
 
+AUTH_TOKEN_CASES = {
+    "valid_token": (None, True),   # значение подставится из env
+    "empty_token": ("", False),
+    "invalid_token": ("Bearer INVALID_TOKEN", False),
+    "old_token": ("Bearer OLD_TOKEN", False),
+}
+
+
 @pytest.fixture(
-    params=["valid_token", "empty_token", "invalid_token", "old_token"],
-    ids=["valid_token", "empty_token", "invalid_token", "old_token"],
+    params=list(AUTH_TOKEN_CASES),
+    ids=list(AUTH_TOKEN_CASES),
 )
 def auth_token(request):
     """
-    Фикстура для предоставления разных состояний токена и ожидаемого результата.
-
-    Ожидается, что для сценария "valid_token" в переменной окружения
-    GIGACHAT_VALID_TOKEN будет лежать реальный валидный токен.
-    В репозитории токен не хранится.
+    Разные состояния токена и ожидаемый результат.
+    Для "valid_token" требуется переменная окружения GIGACHAT_VALID_TOKEN.
     """
     case = request.param
-
+    token_value, expected_success = AUTH_TOKEN_CASES[case]
     if case == "valid_token":
-        raw_token = os.getenv("GIGACHAT_VALID_TOKEN")
-        if not raw_token:
-            pytest.skip(
-                "Переменная окружения GIGACHAT_VALID_TOKEN не задана, "
-                "пропускаем сценарий с валидным токеном."
-            )
-        token = f"Bearer {raw_token}"
-        expected_success = True
-    elif case == "empty_token":
-        token = ""
-        expected_success = False
-    elif case == "invalid_token":
-        token = "Bearer INVALID_TOKEN"
-        expected_success = False
-    elif case == "old_token":
-        token = "Bearer OLD_TOKEN"
-        expected_success = False
-    else:
-        pytest.fail(f"Неизвестный сценарий токена: {case}")
-
-    return token, expected_success
+        raw = os.getenv("GIGACHAT_VALID_TOKEN")
+        if not raw:
+            pytest.skip("GIGACHAT_VALID_TOKEN не задана, пропускаем сценарий valid_token.")
+        token_value = f"Bearer {raw}"
+    return token_value, expected_success
 
 
 @pytest.fixture
@@ -84,4 +81,10 @@ def valid_auth_header():
             "пропускаем тесты, завязанные на валидный токен."
         )
     return {"Authorization": f"Bearer {raw_token}"}
+
+
+@pytest.fixture
+def auth_headers(valid_auth_header):
+    """Заголовки для авторизованного JSON-запроса (Authorization + Content-Type)."""
+    return {**valid_auth_header, "Content-Type": "application/json"}
 

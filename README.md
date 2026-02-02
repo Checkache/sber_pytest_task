@@ -5,10 +5,12 @@
 
 ### Структура проекта
 
-- **tests/**: все тесты и общие фикстуры
-  - `conftest.py` — общие фикстуры и базовая конфигурация (URL, таймаут, модель, токены)
-  - `test_auth_token.py` — проверки различных состояний токена авторизации
-  - `test_model_and_messages.py` — проверки полей `model` и `messages`
+- **tests/** — тесты и общая логика
+  - `api.py` — хелперы: `post_chat`, `is_success`, `make_payload` (запросы к API и проверки)
+  - `conftest.py` — фикстуры: URL, таймаут, модель, токены, `auth_headers`
+  - `test_auth_token.py` — авторизация: валидация токена, 401 при невалидном токене
+  - `test_model_and_messages.py` — поля `model`, `messages`, обязательные поля, `attachments`; коды 404, 400/422
+  - `test_response.py` — структура успешного ответа (JSON), потоковая генерация (Content-Type)
 
 ### Зависимости
 
