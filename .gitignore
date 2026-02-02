@@ -1,0 +1,24 @@
+# Общие python-игнорируемые файлы/папки
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Кэш pytest
+.pytest_cache/
+
+# Настройки IDE/редактора
+.vscode/
+.idea/
+
+# Файлы окружения/секреты
+.env
+.env.*
+
