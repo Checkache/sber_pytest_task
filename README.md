@@ -39,3 +39,32 @@ pip install -r requirements.txt
 pytest
 ```
 
+### Отчёты в Allure
+
+Для генерации Allure-отчётов используется плагин `allure-pytest` и файл `pytest.ini`.
+
+1. Установите плагин (если ещё не установлен):
+
+```bash
+pip install allure-pytest
+```
+
+2. Запустите тесты (результаты будут сохранены в папку `allure-results` автоматически,
+   путь задан в `pytest.ini`):
+
+```bash
+pytest
+```
+
+3. Сгенерируйте и откройте HTML-отчёт (требуется установленный Allure Commandline):
+
+```bash
+allure serve allure-results
+```
+
+Либо можно сгенерировать отчёт в папку и открыть его вручную:
+
+```bash
+allure generate allure-results -o allure-report --clean
+```
+
